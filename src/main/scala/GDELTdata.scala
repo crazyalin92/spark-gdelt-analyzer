@@ -34,37 +34,37 @@ class GDELTdata(sparkSession: SparkSession, input: String) {
     StructField("Actor2Type1Code", StringType, true),
     StructField("Actor2Type2Code", StringType, true),
     StructField("Actor2Type3Code", StringType, true),
-    StructField("IsRootEvent", IntegerType, true),
+    StructField("IsRootEvent", StringType, true),
     StructField("EventCode", StringType, true),
     StructField("EventBaseCode", StringType, true),
     StructField("EventRootCode", StringType, true),
-    StructField("QuadClass", IntegerType, true),
+    StructField("QuadClass", StringType, true),
     StructField("GoldsteinScale", DoubleType, true),
     StructField("NumMentions", IntegerType, true),
     StructField("NumSources", IntegerType, true),
     StructField("NumArticles", IntegerType, true),
     StructField("AvgTone", DoubleType, true),
-    StructField("Actor1Geo_Type", IntegerType, true),
+    StructField("Actor1Geo_Type", StringType, true),
     StructField("Actor1Geo_FullName", StringType, true),
-    StructField("Actor1Geo_CountryCode", IntegerType, true),
+    StructField("Actor1Geo_CountryCode", StringType, true),
     StructField("Actor1Geo_ADM1Code", StringType, true),
     StructField("Actor1Geo_Lat", FloatType, true),
     StructField("Actor1Geo_Long", FloatType, true),
-    StructField("Actor1Geo_FeatureID", IntegerType, true),
-    StructField("Actor2Geo_Type", IntegerType, true),
+    StructField("Actor1Geo_FeatureID", StringType, true),
+    StructField("Actor2Geo_Type", StringType, true),
     StructField("Actor2Geo_FullName", StringType, true),
     StructField("Actor2Geo_CountryCode", StringType, true),
     StructField("Actor2Geo_ADM1Code", StringType, true),
     StructField("Actor2Geo_Lat", FloatType, true),
     StructField("Actor2Geo_Long", FloatType, true),
-    StructField("Actor2Geo_FeatureID", IntegerType, true),
-    StructField("ActionGeo_Type", IntegerType, true),
+    StructField("Actor2Geo_FeatureID", StringType, true),
+    StructField("ActionGeo_Type", StringType, true),
     StructField("ActionGeo_FullName", StringType, true),
     StructField("ActionGeo_CountryCode", StringType, true),
     StructField("ActionGeo_ADM1Code", StringType, true),
     StructField("ActionGeo_Lat", FloatType, true),
     StructField("ActionGeo_Long", FloatType, true),
-    StructField("ActionGeo_FeatureID", IntegerType, true),
+    StructField("ActionGeo_FeatureID", StringType, true),
     StructField("DATEADDED", IntegerType, true),
     StructField("SOURCEURL", StringType, true)))
 
@@ -80,7 +80,7 @@ class GDELTdata(sparkSession: SparkSession, input: String) {
   def readCountryDataFrame(country: String): DataFrame = {
 
     val gdelt_reduced = gdelt.
-      select("GLOBALEVENTID", "EventCode", "ActionGeo_CountryCode", "ActionGeo_Lat", "ActionGeo_Long")
+      select("GLOBALEVENTID", "EventCode", "Actor1Code", "ActionGeo_Lat", "ActionGeo_Long")
       .where("ActionGeo_Lat is not null")
       .where("ActionGeo_Lat is not null")
       .where("ActionGeo_CountryCode =" + country)
@@ -96,6 +96,16 @@ class GDELTdata(sparkSession: SparkSession, input: String) {
       .where("ActionGeo_Lat is not null")
       .where("ActionGeo_CountryCode =" + country)
       .where("EventCode =" + refEventCode)
+
+    return gdelt_reduced
+  }
+
+  def readActors(country: String): DataFrame = {
+
+    val gdelt_reduced = gdelt
+      .select("GLOBALEVENTID", "EventCode", "Actor1Name")
+      .where("Actor1Name is not null")
+      .where("ActionGeo_CountryCode =" + country)
 
     return gdelt_reduced
   }
